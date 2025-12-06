@@ -1,1 +1,5 @@
+# Deployment configs
+render.yaml
+*.yaml
+deploy/
 .env

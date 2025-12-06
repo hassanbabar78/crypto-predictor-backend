@@ -43,9 +43,10 @@ class PredictRequest(BaseModel):
 # ========== APP ==========
 app = FastAPI(title="Crypto Predictor Pro", version="5.0")
 
+# Update CORS for production
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # For now, restrict in production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -533,18 +534,3 @@ async def get_coin_prices(coin: str, limit: int = 100):
         "history": history,
         "count": len(history)
     }
-
-
-
-if __name__ == "__main__":
-    import uvicorn
-    print("\n" + "="*60)
-    print("🚀 CRYPTO PREDICTOR PRO - REAL SOLANA VERIFICATION")
-    print("="*60)
-    print(f"💰 Payment Address: {YOUR_WALLET}")
-    print(f"🌐 Solana Devnet RPC: {SOLANA_RPC_URL}")
-    print(f"🔍 Using direct RPC calls for verification")
-    print("="*60 + "\n")
-    import uvicorn
-    port = int(os.getenv("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)

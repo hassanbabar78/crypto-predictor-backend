@@ -4,6 +4,7 @@ import json
 import requests
 from datetime import datetime
 import time
+import os
 
 class LiveCryptoWebSocketServer:
     def __init__(self):
@@ -258,7 +259,7 @@ class LiveCryptoWebSocketServer:
             except Exception as e:
                 print(f"❌ Error in periodic update: {e}")
     
-    async def run_server(self):
+    async def start(self):
         """Start the WebSocket server"""
         print("🚀 Live Crypto WebSocket Server Starting...")
         print("="*60)
@@ -266,21 +267,19 @@ class LiveCryptoWebSocketServer:
         for symbol, name in self.supported_coins.items():
             print(f"   • {symbol}: {name}")
         print(f"\n📈 Supported Timeframes: {', '.join(self.supported_intervals)}")
-        print(f"\n🌐 Server: ws://localhost:8765")
+        
+        # Get WebSocket port from environment
+        ws_port = int(os.getenv("WS_PORT", 8765))
+        print(f"\n🌐 WebSocket URL: ws://0.0.0.0:{ws_port}")
         print(f"⏰ Updates: Every 4 hours")
         print(f"📊 Data: Last 1000 candles per coin/interval")
         print("="*60)
         
-        # Start periodic update
-        update_task = asyncio.create_task(self.periodic_update())
+        # Start periodic update in background
+        asyncio.create_task(self.periodic_update())
         
         # Start WebSocket server
-        port = int(os.getenv("PORT", 8765))  # Use Render-provided PORT
-        async with websockets.serve(self.handle_client, "localhost", port):
-            print("✅ WebSocket server started!")
+        async with websockets.serve(self.handle_client, "0.0.0.0", ws_port):
+            print(f"✅ WebSocket server started on port {ws_port}!")
             print("⏳ Waiting for client connections...")
             await asyncio.Future()  # Run forever
-
-if __name__ == "__main__":
-    server = LiveCryptoWebSocketServer()
-    asyncio.run(server.run_server())
